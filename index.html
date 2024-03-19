@@ -8,6 +8,8 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #0e0e0e;
+            color: #ffffff;
         }
         #host {
             font-weight: bold;
@@ -17,7 +19,15 @@
         #symbiote {
             font-weight: bold;
             font-size: 24px;
-            color: black;
+        }
+        #container {
+            margin-top: 50px;
+        }
+        #control-panel {
+            margin-top: 20px;
+        }
+        canvas {
+            border: 1px solid white;
         }
     </style>
 </head>
@@ -26,19 +36,99 @@
     <div id="container">
         <p>Host: <span id="host">None</span></p>
         <p>Symbiote: <span id="symbiote">Inactive</span></p>
-        <button onclick="attachSymbiote()">Attach Symbiote</button>
+        <button onclick="toggleSymbiote()">Toggle Symbiote</button>
     </div>
+
+    <div id="control-panel">
+        <h2>Control Panel</h2>
+        <label for="color-picker">Symbiote Color:</label>
+        <input type="color" id="color-picker" onchange="changeSymbioteColor(this.value)">
+        <br>
+        <label for="host-name">Host Name:</label>
+        <input type="text" id="host-name">
+        <button onclick="updateHostName()">Update Host</button>
+        <br>
+        <label for="deformation-slider">Deformation:</label>
+        <input type="range" id="deformation-slider" min="0" max="100" value="50" onchange="changeDeformation(this.value)">
+        <br>
+        <label for="speed-slider">Speed:</label>
+        <input type="range" id="speed-slider" min="1" max="10" value="5" onchange="changeSpeed(this.value)">
+    </div>
+
+    <canvas id="symbioteCanvas" width="800" height="600"></canvas>
 
     <script>
         let host = document.getElementById('host');
         let symbioteStatus = document.getElementById('symbiote');
+        let hostNameInput = document.getElementById('host-name');
+        let deformationSlider = document.getElementById('deformation-slider');
+        let speedSlider = document.getElementById('speed-slider');
+        let colorPicker = document.getElementById('color-picker');
+        let symbioteActive = false;
+        let symbioteColor = '#00ff00'; // Default symbiote color
+        let symbioteDeformation = 0.5; // Default deformation
+        let symbioteSpeed = 5; // Default speed
 
-        function attachSymbiote() {
-            host.innerText = 'Eddie Brock'; // Default host
-            symbioteStatus.innerText = 'Active';
-            symbioteStatus.style.color = 'white';
-            document.body.style.backgroundColor = 'black';
-            document.body.style.color = 'white';
+        function toggleSymbiote() {
+            symbioteActive = !symbioteActive;
+            if (symbioteActive) {
+                symbioteStatus.innerText = 'Active';
+                animateSymbiote();
+            } else {
+                symbioteStatus.innerText = 'Inactive';
+                clearCanvas();
+            }
+        }
+
+        function changeSymbioteColor(color) {
+            symbioteColor = color;
+        }
+
+        function updateHostName() {
+            let newHostName = hostNameInput.value;
+            if (newHostName.trim() !== '') {
+                host.innerText = newHostName;
+            }
+        }
+
+        function changeDeformation(value) {
+            symbioteDeformation = value / 100;
+        }
+
+        function changeSpeed(value) {
+            symbioteSpeed = value;
+        }
+
+        function animateSymbiote() {
+            clearCanvas();
+            let canvas = document.getElementById('symbioteCanvas');
+            let ctx = canvas.getContext('2d');
+
+            // Example: Draw a basic symbiote shape
+            ctx.beginPath();
+            ctx.moveTo(100, 100);
+            ctx.lineTo(150, 50);
+            ctx.lineTo(200, 100);
+            ctx.lineTo(200, 200);
+            ctx.lineTo(100, 200);
+            ctx.closePath();
+            ctx.fillStyle = symbioteColor;
+            ctx.fill();
+
+            // Add animation effects here
+            // Example: Move the symbiote based on speed
+            // Example: Apply deformation effect
+            // Example: Interact with the host
+
+            if (symbioteActive) {
+                requestAnimationFrame(animateSymbiote);
+            }
+        }
+
+        function clearCanvas() {
+            let canvas = document.getElementById('symbioteCanvas');
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
     </script>
 </body>
