@@ -412,13 +412,26 @@ function closestNumber(n, m) {
 }
 
 function resizeCanvas() {
-    const canvasWidth = closestNumber(window.innerWidth, gridSize);
-    const canvasHeight = closestNumber(window.innerHeight, gridSize);
+    const gridSize = 20; // Define gridSize
+    const canvas = document.getElementById('canvas');
+    const scoreDisplay = document.getElementById('score');
+    
+    // Calculate zoom factor
+    var deviceWidth, landscape = Math.abs(window.orientation) == 90
+    // workaround for strange screen.height on the iPhone (v3.1.3)
+    if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+    else deviceWidth = window.screen[landscape ? "height" : "width"]
+    var zoomFactor = deviceWidth / window.innerWidth;
+    var antiZoomFactor = 1 / zoomFactor;
 
-        // Set canvas width and height
+    // Adjust canvas size
+    const canvasWidth = closestNumber(window.innerWidth * antiZoomFactor, gridSize);
+    const canvasHeight = closestNumber(window.innerHeight * antiZoomFactor, gridSize);
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
-
+    
+    // Adjust score display size
+    scoreDisplay.style.fontSize = (16 * antiZoomFactor) + 'px'; // Adjust font size based on the anti-zoom factor
     
     // Adjust food position if it's out of bounds
     if (food.x >= canvasWidth / gridSize) {
