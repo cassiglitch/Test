@@ -1,135 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venom Symbiote Simulation</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #0e0e0e;
-            color: #ffffff;
-        }
-        #host {
-            font-weight: bold;
-            font-size: 24px;
-            color: red;
-        }
-        #symbiote {
-            font-weight: bold;
-            font-size: 24px;
-        }
-        #container {
-            margin-top: 50px;
-        }
-        #control-panel {
-            margin-top: 20px;
-        }
-        canvas {
-            border: 1px solid white;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venom Symbiote Simulation</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+    }
+    canvas {
+        display: block;
+    }
+</style>
 </head>
 <body>
-    <h1>Venom Symbiote Simulation</h1>
-    <div id="container">
-        <p>Host: <span id="host">None</span></p>
-        <p>Symbiote: <span id="symbiote">Inactive</span></p>
-        <button onclick="toggleSymbiote()">Toggle Symbiote</button>
-    </div>
+<canvas id="canvas"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.18.0/matter.min.js"></script>
+<script>
+    // Initialize Matter.js engine
+    const { Engine, Render, World, Bodies, Body, Events } = Matter;
+    const engine = Engine.create();
+    const render = Render.create({
+        element: document.body,
+        engine: engine,
+        options: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            wireframes: false
+        }
+    });
+    Render.run(render);
+    const world = engine.world;
 
-    <div id="control-panel">
-        <h2>Control Panel</h2>
-        <label for="color-picker">Symbiote Color:</label>
-        <input type="color" id="color-picker" onchange="changeSymbioteColor(this.value)">
-        <br>
-        <label for="host-name">Host Name:</label>
-        <input type="text" id="host-name">
-        <button onclick="updateHostName()">Update Host</button>
-        <br>
-        <label for="deformation-slider">Deformation:</label>
-        <input type="range" id="deformation-slider" min="0" max="100" value="50" onchange="changeDeformation(this.value)">
-        <br>
-        <label for="speed-slider">Speed:</label>
-        <input type="range" id="speed-slider" min="1" max="10" value="5" onchange="changeSpeed(this.value)">
-    </div>
-
-    <canvas id="symbioteCanvas" width="800" height="600"></canvas>
-
-    <script>
-        let host = document.getElementById('host');
-        let symbioteStatus = document.getElementById('symbiote');
-        let hostNameInput = document.getElementById('host-name');
-        let deformationSlider = document.getElementById('deformation-slider');
-        let speedSlider = document.getElementById('speed-slider');
-        let colorPicker = document.getElementById('color-picker');
-        let symbioteActive = false;
-        let symbioteColor = '#00ff00'; // Default symbiote color
-        let symbioteDeformation = 0.5; // Default deformation
-        let symbioteSpeed = 5; // Default speed
-
-        function toggleSymbiote() {
-            symbioteActive = !symbioteActive;
-            if (symbioteActive) {
-                symbioteStatus.innerText = 'Active';
-                animateSymbiote();
-            } else {
-                symbioteStatus.innerText = 'Inactive';
-                clearCanvas();
+    // Define Venom symbiote entity
+    const venom = Bodies.circle(400, 200, 50, {
+        render: {
+            sprite: {
+                texture: 'venom.png'
             }
-        }
+        },
+        mass: 10,
+        frictionAir: 0.1
+    });
+    World.add(world, venom);
 
-        function changeSymbioteColor(color) {
-            symbioteColor = color;
-        }
-
-        function updateHostName() {
-            let newHostName = hostNameInput.value;
-            if (newHostName.trim() !== '') {
-                host.innerText = newHostName;
+    // Function to spawn objects for consumption
+    function spawnObject(x, y) {
+        const object = Bodies.rectangle(x, y, 40, 40, {
+            render: {
+                fillStyle: 'red'
             }
-        }
+        });
+        World.add(world, object);
+    }
 
-        function changeDeformation(value) {
-            symbioteDeformation = value / 100;
-        }
+    // Event listener to spawn objects on click
+    document.body.addEventListener('click', function(event) {
+        spawnObject(event.clientX, event.clientY);
+    });
 
-        function changeSpeed(value) {
-            symbioteSpeed = value;
-        }
-
-        function animateSymbiote() {
-            clearCanvas();
-            let canvas = document.getElementById('symbioteCanvas');
-            let ctx = canvas.getContext('2d');
-
-            // Example: Draw a basic symbiote shape
-            ctx.beginPath();
-            ctx.moveTo(100, 100);
-            ctx.lineTo(150, 50);
-            ctx.lineTo(200, 100);
-            ctx.lineTo(200, 200);
-            ctx.lineTo(100, 200);
-            ctx.closePath();
-            ctx.fillStyle = symbioteColor;
-            ctx.fill();
-
-            // Add animation effects here
-            // Example: Move the symbiote based on speed
-            // Example: Apply deformation effect
-            // Example: Interact with the host
-
-            if (symbioteActive) {
-                requestAnimationFrame(animateSymbiote);
+    // Attraction and consumption behavior
+    Events.on(engine, 'beforeUpdate', function(event) {
+        const objects = world.bodies.filter(body => body !== venom && body.render.fillStyle === 'red');
+        objects.forEach(object => {
+            const forceMagnitude = 0.001 * venom.mass * object.mass / Math.pow(Body.magnitude(Body.sub(venom.position, object.position)), 2);
+            Body.applyForce(object, object.position, Body.scale(Body.normalise(Body.sub(venom.position, object.position)), forceMagnitude));
+            if (Body.contains(venom, object)) {
+                World.remove(world, object);
+                venom.mass += 0.5; // Increase Venom's mass on consumption
             }
-        }
+        });
+    });
 
-        function clearCanvas() {
-            let canvas = document.getElementById('symbioteCanvas');
-            let ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-    </script>
+    // Add physics interactions
+    World.add(world, [
+        Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 50, window.innerWidth, 100, { isStatic: true }), // Ground
+        Bodies.rectangle(window.innerWidth / 2, -50, window.innerWidth, 100, { isStatic: true }), // Ceiling
+        Bodies.rectangle(-50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true }), // Left wall
+        Bodies.rectangle(window.innerWidth + 50, window.innerHeight / 2, 100, window.innerHeight, { isStatic: true }) // Right wall
+    ]);
+
+    // Run the engine
+    Engine.run(engine);
+</script>
 </body>
 </html>
