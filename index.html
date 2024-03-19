@@ -442,6 +442,67 @@ function resizeCanvas() {
     }
 }
 
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browser Zoom Level Detector</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    position: absolute; /* Set position to absolute */
+    width: 100%; /* Occupy full width of the viewport */
+    height: 100%; /* Occupy full height of the viewport */
+    overflow: hidden; /* Prevent horizontal and vertical scrolling */
+  }
+  
+  #content {
+    position: absolute; /* Set position to absolute */
+    top: 50%; /* Align to vertical center */
+    left: 50%; /* Align to horizontal center */
+    transform-origin: top left; /* Set transform origin to top left */
+    transform: translate(-50%, -50%); /* Translate back to center */
+  }
+  
+  p {
+    margin: 0; /* Remove default margins for consistent display */
+    font-size: 16px; /* Adjust font size for readability */
+    white-space: pre-wrap; /* Preserve line breaks */
+  }
+</style>
+</head>
+<body>
+<div id="content">
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sollicitudin tortor in lacus tincidunt volutpat. Integer dignissim imperdiet mollis. Suspendisse quis tortor velit, placerat tempor neque. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Praesent bibendum auctor lorem vitae tempor. Nullam condimentum aliquam elementum. Nullam egestas gravida elementum. Maecenas mattis molestie nisl sit amet vehicula. Donec semper tristique blandit. Vestibulum adipiscing placerat mollis.</p>
+</div>
+
+<script>
+function getZoomFactor() {
+  var deviceWidth, landscape = Math.abs(window.orientation) == 90
+  // workaround for strange screen.height on the iPhone (v3.1.3)
+  if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
+  else deviceWidth = window.screen[landscape ? "height" : "width"]
+  var zoomFactor = deviceWidth / window.innerWidth;
+  var antiZoomFactor = 1 / zoomFactor;
+  
+  // Apply anti-zoom effect to the content
+  if (antiZoomFactor !== 1) {
+    document.getElementById('content').style.transform = 'scale(' + antiZoomFactor.toFixed(2) + ')';
+  } else {
+    document.getElementById('content').style.transform = 'none';
+  }
+}
+
+// Call the function initially and then refresh every second
+getZoomFactor(); // Call initially
+setInterval(getZoomFactor, 1000); // Refresh every second
+</script>
+</body>
+</html>
+
 // Handle arrow key presses
 document.addEventListener('keydown', event => {
     // Prevent default arrow key behavior (scrolling)
