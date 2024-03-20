@@ -19,9 +19,13 @@
     position: absolute; /* Position relative to the canvas */
     top: 20px; /* Adjust top position as needed */
     left: 0px; /* Adjust left position as needed */
-    z-index: 0; /* Ensure the score display appears above the canvas */
+    z-index: 1; /* Ensure the score display appears above the canvas */
+    touch-action: none;
 }
         canvas {
+    position: absolute;
+    top: 0px; /* Adjust the top position as needed */
+    bottom: 0px; /* Adjust the bottom position as needed */
     margin: auto;
     border: 1px solid #ddd;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -491,10 +495,7 @@ function storeOriginalCanvasPosition() {
         // Call the adjustCanvasPosition function periodically
         window.addEventListener('load', () => {
             storeOriginalCanvasPosition()
-            adjustCanvasPosition()
-            getZoomFactor()
-            resizeCanvas();
-        });
+                    });
         setInterval(getZoomFactor, 1); // Adjust the interval as needed
         setInterval(adjustCanvasPosition, 1);
     </script>
