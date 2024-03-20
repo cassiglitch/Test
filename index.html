@@ -13,22 +13,23 @@
             margin: 0;
             overflow: hidden; /* No more scrolling for you! */
             background-color: #f0f0f0; /* Set a background color */
-            touch-action: none;
         }
 
-#scoreDisplay {
-    position: absolute; /* Position relative to the canvas */
-    top: 20px; /* Adjust top position as needed */
-    left: 0px; /* Adjust left position as needed */
-    z-index: 1; /* Ensure the score display appears above the canvas */
-    touch-action: none;
-}
+        #scoreDisplay {
+            margin-top: 20px;
+        }
+
         canvas {
             position: absolute;
-            overflow: hidden; /* No more scrolling for you! */
-            background-color: #f0f0f0; /* Set a background color */
+            top: 0px; /* Adjust the top position as needed */
+            bottom: 0px; /* Adjust the bottom position as needed */
             border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow to the canvas */
+        }
+        body {
+            position: absolute;
+            overflow: hidden; /* Disable scrolling */
+            touch-action: none; /* Disable touch actions on the canvas */
         }
     </style>
     <title>Snake Game</title>
@@ -41,6 +42,7 @@
         const canvas = document.getElementById('snakeCanvas');
         const ctx = canvas.getContext('2d');
 
+        let gridSize = 20;
         let startingLength = 5;
         let snake = Array.from({ length: startingLength }, (_, index) => ({ x: 10, y: 10 - index, color: 'green' }));
         let food = { x: 0, y: 0 };
@@ -55,10 +57,6 @@
         let isColliding = false;
         let collisionAnimationFrames = 10;
         let isPaused = false;
-        let startingGridSize = 20; // Initial grid size
-        let gridSize = startingGridSize; // Current grid size
-
-
 function draw() {
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -457,7 +455,6 @@ document.addEventListener('keydown', event => {
             clearInterval(gameInterval);
         });
 
-
         function getZoomFactor() {
             var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
@@ -472,6 +469,7 @@ document.addEventListener('keydown', event => {
         }
 
         setInterval(getZoomFactor, 1); // Adjust the interval as needed
+
     </script>
 </body>
 </html>
