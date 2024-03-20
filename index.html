@@ -70,7 +70,7 @@
             var antiZoomFactor = 1 / zoomFactor;
           
             // Apply zoom and anti-zoom factors to grid size
-            gridSize = startingGridSize * antiZoomFactor;
+            gridSize = Math.max(0, Math.ceil(startingGridSize * antiZoomFactor));
             document.getElementById('scoreDisplay').style.top = (20 * antiZoomFactor) + 'px';
         }
 
