@@ -57,7 +57,6 @@
         let isPaused = false;
         let startingGridSize = 20; // Initial grid size
         let gridSize = startingGridSize; // Current grid size
-        let originalCanvasPosition = { left: '0px', top: '50px' };
 
 
 function draw() {
@@ -457,15 +456,6 @@ document.addEventListener('keydown', event => {
         window.addEventListener('beforeunload', () => {
             clearInterval(gameInterval);
         });
-                // Function to adjust the canvas position if moved
-function adjustCanvasPosition() {
-    const canvas = document.getElementById('snakeCanvas');
-
-    // Restore the canvas to its original position
-    canvas.style.position = 'absolute';
-    canvas.style.left = originalCanvasPosition.left;
-    canvas.style.top = originalCanvasPosition.top;
-}
 
 
         function getZoomFactor() {
@@ -482,7 +472,6 @@ function adjustCanvasPosition() {
         }
 
         setInterval(getZoomFactor, 1); // Adjust the interval as needed
-        setInterval(adjustCanvasPosition, 1);
     </script>
 </body>
 </html>
