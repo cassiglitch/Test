@@ -58,6 +58,7 @@
         let isPaused = false;
         let startingGridSize = 20; // Initial grid size
         let gridSize = startingGridSize; // Current grid size
+        let originalCanvasPosition = { left: '0px', top: '0px' };
 
 
 function draw() {
@@ -461,11 +462,19 @@ document.addEventListener('keydown', event => {
 function adjustCanvasPosition() {
     const canvas = document.getElementById('snakeCanvas');
 
-    // Move the canvas back to the correct/original position
-    canvas.style.position = 'absolute'; // Change to 'absolute'
-    canvas.style.left = '0';
-    canvas.style.top = '0';
+    // Restore the canvas to its original position
+    canvas.style.position = 'absolute';
+    canvas.style.left = originalCanvasPosition.left;
+    canvas.style.top = originalCanvasPosition.top;
 }
+
+// Call this function when the page loads to store the original position
+function storeOriginalCanvasPosition() {
+    const canvas = document.getElementById('snakeCanvas');
+    originalCanvasPosition.left = canvas.style.left;
+    originalCanvasPosition.top = canvas.style.top;
+}
+
         function getZoomFactor() {
             var deviceWidth, landscape = Math.abs(window.orientation) == 90
             // workaround for strange screen.height on the iPhone (v3.1.3)
@@ -480,7 +489,14 @@ function adjustCanvasPosition() {
         }
 
         // Call the adjustCanvasPosition function periodically
+        window.addEventListener('load', () => {
+            storeOriginalCanvasPosition()
+            adjustCanvasPosition()
+            getZoomFactor()
+            resizeCanvas();
+        });
         setInterval(getZoomFactor, 1); // Adjust the interval as needed
+        setInterval(adjustCanvasPosition, 1);
     </script>
 </body>
 </html>
