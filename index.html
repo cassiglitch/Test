@@ -472,12 +472,6 @@ function adjustCanvasPosition() {
     canvas.style.top = originalCanvasPosition.top;
 }
 
-// Call this function when the page loads to store the original position
-function storeOriginalCanvasPosition() {
-    const canvas = document.getElementById('snakeCanvas');
-    originalCanvasPosition.left = canvas.style.left;
-    originalCanvasPosition.top = canvas.style.top;
-}
 
         function getZoomFactor() {
             var deviceWidth, landscape = Math.abs(window.orientation) == 90
@@ -492,10 +486,6 @@ function storeOriginalCanvasPosition() {
             document.getElementById('scoreDisplay').style.top = (20 * antiZoomFactor) + 'px';
         }
 
-        // Call the adjustCanvasPosition function periodically
-        window.addEventListener('load', () => {
-            storeOriginalCanvasPosition()
-                    });
         setInterval(getZoomFactor, 1); // Adjust the interval as needed
         setInterval(adjustCanvasPosition, 1);
     </script>
