@@ -13,6 +13,7 @@
             margin: 0;
             overflow: hidden; /* No more scrolling for you! */
             background-color: #f0f0f0; /* Set a background color */
+            touch-action: none;
         }
 
 #scoreDisplay {
@@ -23,19 +24,9 @@
     touch-action: none;
 }
         canvas {
-    position: absolute;
-    top: 0px; /* Adjust the top position as needed */
-    position: absolute;
-        right: 50%;
-        transform: translateX(50%);
-    bottom: 0px; 
-    border: 10px solid #ddd;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-        body {
-            position: absolute;
-            overflow: hidden; /* Disable scrolling */
-             /* Disable touch actions on the canvas */
+            margin: auto;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
     <title>Snake Game</title>
