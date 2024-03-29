@@ -3,87 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake Biting Animation</title>
+  <title>Snake Bite Animation</title>
   <style>
-    .grid-container {
+    #grid {
+      width: 200px;
+      height: 200px;
       display: grid;
-      grid-template-columns: repeat(20, 20px);
-      grid-template-rows: repeat(20, 20px);
-      gap: 2px;
-    }
-
-    .grid-item {
-      width: 20px;
-      height: 20px;
-      background-color: darkgreen;
+      grid-template-columns: repeat(20, 10px); /* Adjust based on desired grid size */
+      grid-template-rows: repeat(20, 10px);
     }
 
     .snake-head {
       background-color: lightgreen;
-      animation: swellAnimation 1s ease-in-out infinite alternate;
+      grid-column: 10 / span 1; /* Adjust grid position for head */
+      grid-row: 10 / span 1;
     }
 
-    @keyframes swellAnimation {
-      0% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(1.2);
-      }
-      100% {
-        transform: scale(1);
-      }
+    .snake-head.open {
+      background-color: lightgreen;
+      grid-column: 10;
+      grid-row: 10;
+      border-radius: 50%;
+      /* Add details for open mouth here (optional) */
+      /* Example: border-bottom: 5px solid red; */
     }
 
-    .snake-teeth {
-      background-color: white;
-      border: 1px solid black;
-      animation: biteAnimation 1s ease-in-out infinite alternate;
+    .snake-open-top {
+      background-color: lightgreen;
+      grid-column: 9 / span 2;
+      grid-row: 9;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
     }
 
-    @keyframes biteAnimation {
-      0% {
-        transform: scaleY(1);
-      }
-      50% {
-        transform: scaleY(1.1);
-      }
-      100% {
-        transform: scaleY(1);
-      }
+    .snake-open-bottom {
+      background-color: lightgreen;
+      grid-column: 9 / span 2;
+      grid-row: 11;
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="grid-container" id="gridContainer"></div>
+  <div id="grid"></div>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const gridContainer = document.getElementById("gridContainer");
+    const grid = document.getElementById('grid');
+    const head = document.querySelector('.snake-head');
 
-      // Create grid items
-      for (let i = 0; i < 400; i++) {
-        const gridItem = document.createElement("div");
-        gridItem.classList.add("grid-item");
-        gridContainer.appendChild(gridItem);
+    let open = false;
+
+    function animateBite() {
+      open = !open;
+
+      head.classList.toggle('open');
+
+      if (open) {
+        grid.classList.add('snake-open-top');
+        grid.classList.add('snake-open-bottom');
+      } else {
+        grid.classList.remove('snake-open-top');
+        grid.classList.remove('snake-open-bottom');
       }
 
-      // Add snake head to the grid
-      const snakeHead = document.createElement("div");
-      snakeHead.classList.add("grid-item", "snake-head");
-      snakeHead.appendChild(createSnakeTeeth());
-      gridContainer.appendChild(snakeHead);
-    });
-
-    function createSnakeTeeth() {
-      const teethContainer = document.createElement("div");
-      teethContainer.classList.add("snake-teeth");
-      for (let i = 0; i < 4; i++) {
-        const tooth = document.createElement("div");
-        tooth.classList.add("grid-item");
-        teethContainer.appendChild(tooth);
-      }
-      return teethContainer;
+      setTimeout(animateBite, 200); // Adjust animation speed
     }
+
+    animateBite();
   </script>
 </body>
 </html>
