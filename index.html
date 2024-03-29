@@ -1,203 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake RPG</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Biting Animation</title>
+  <style>
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(20, 20px);
+      grid-template-rows: repeat(20, 20px);
+      gap: 2px;
+    }
 
-        .game-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    .grid-item {
+      width: 20px;
+      height: 20px;
+      background-color: lightgreen;
+    }
 
-        .game-board {
-            width: 400px;
-            height: 400px;
-            background-color: #ddd;
-            border: 2px solid #333;
-            position: relative;
-        }
+    .snake-head {
+      background-color: green;
+      animation: swellAnimation 1s ease-in-out infinite alternate;
+    }
 
-        .info-panel {
-            margin-left: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-        }
+    @keyframes swellAnimation {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
 
-        .stats {
-            margin-bottom: 20px;
-        }
+    .snake-teeth {
+      background-color: white;
+      border: 1px solid black;
+      animation: biteAnimation 2s ease-in-out infinite alternate;
+    }
 
-        .skill-tree {
-            border-top: 2px solid #333;
-            margin-top: 20px;
-            padding-top: 20px;
-        }
-
-        .skill {
-            display: inline-block;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        .enemy {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            border-radius: 50%;
-        }
-    </style>
+    @keyframes biteAnimation {
+      0%, 100% {
+        transform: scaleY(1);
+      }
+      50% {
+        transform: scaleY(1.1);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="game-board">
-            <!-- Game board where the snake moves -->
-        </div>
-        <div class="info-panel">
-            <h2>Snake RPG</h2>
-            <div class="stats">
-                <p>Level: <span id="level">1</span></p>
-                <p>Experience: <span id="experience">0</span></p>
-                <p>Skills: <span id="skills">0</span></p>
-            </div>
-            <div class="skill-tree">
-                <!-- Skill tree will be populated dynamically using JavaScript -->
-            </div>
-        </div>
-    </div>
+  <div class="grid-container" id="gridContainer"></div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const gridContainer = document.getElementById("gridContainer");
 
-    <script>
-        // Game variables
-        let level = 1;
-        let experience = 0;
-        let skills = 0;
-        let enemies = [];
-        let enemyInterval;
+      // Create grid items
+      for (let i = 0; i < 400; i++) {
+        const gridItem = document.createElement("div");
+        gridItem.classList.add("grid-item");
+        gridContainer.appendChild(gridItem);
+      }
 
-        // Function to update stats display
-        function updateStats() {
-            document.getElementById('level').textContent = level;
-            document.getElementById('experience').textContent = experience;
-            document.getElementById('skills').textContent = skills;
-        }
+      // Add snake head to the grid
+      const snakeHead = document.createElement("div");
+      snakeHead.classList.add("grid-item", "snake-head");
+      snakeHead.appendChild(createSnakeTeeth());
+      gridContainer.appendChild(snakeHead);
+    });
 
-        // Function to handle skill tree
-        function upgradeSkill(skill) {
-            if (skills > 0) {
-                // Upgrade skill
-                switch (skill) {
-                    case 'attack':
-                        // Implement attack skill logic
-                        break;
-                    case 'defense':
-                        // Implement defense skill logic
-                        break;
-                    // Add more skills here as needed
-                }
-                // Deduct one skill point
-                skills--;
-                updateStats();
-            } else {
-                alert('You need more skills to upgrade this!');
-            }
-        }
-
-        // Function to generate random position
-        function randomPosition() {
-            const position = {
-                x: Math.floor(Math.random() * 19) * 20,
-                y: Math.floor(Math.random() * 19) * 20
-            };
-            return position;
-        }
-
-        // Function to create enemy
-        function createEnemy() {
-            const enemy = document.createElement('div');
-            enemy.classList.add('enemy');
-            const position = randomPosition();
-            enemy.style.left = position.x + 'px';
-            enemy.style.top = position.y + 'px';
-            document.querySelector('.game-board').appendChild(enemy);
-            enemies.push(enemy);
-        }
-
-        // Function to move enemies
-        function moveEnemies() {
-            enemies.forEach(enemy => {
-                const direction = Math.floor(Math.random() * 4); // 0: up, 1: down, 2: left, 3: right
-                switch (direction) {
-                    case 0:
-                        enemy.style.top = parseInt(enemy.style.top) - 20 + 'px';
-                        break;
-                    case 1:
-                        enemy.style.top = parseInt(enemy.style.top) + 20 + 'px';
-                        break;
-                    case 2:
-                        enemy.style.left = parseInt(enemy.style.left) - 20 + 'px';
-                        break;
-                    case 3:
-                        enemy.style.left = parseInt(enemy.style.left) + 20 + 'px';
-                        break;
-                }
-            });
-        }
-
-        // Function to handle enemy encounters
-        function checkEncounter() {
-            const snakeHead = document.querySelector('.snake').firstElementChild;
-            const snakeRect = snakeHead.getBoundingClientRect();
-            enemies.forEach(enemy => {
-                const enemyRect = enemy.getBoundingClientRect();
-                if (snakeRect.left < enemyRect.right &&
-                    snakeRect.right > enemyRect.left &&
-                    snakeRect.top < enemyRect.bottom &&
-                    snakeRect.bottom > enemyRect.top) {
-                    alert('You encountered an enemy!');
-                    // Handle encounter logic (e.g., decrease health, award experience)
-                }
-            });
-        }
-
-        // Function to initialize game
-        function initGame() {
-            updateStats();
-            // Dynamically populate skill tree
-            const skillTree = document.querySelector('.skill-tree');
-            const skillsList = ['attack', 'defense']; // Example skills
-            skillsList.forEach(skill => {
-                const skillElement = document.createElement('div');
-                skillElement.textContent = skill;
-                skillElement.classList.add('skill');
-                skillElement.addEventListener('click', () => upgradeSkill(skill));
-                skillTree.appendChild(skillElement);
-            });
-
-            // Start creating enemies
-            enemyInterval = setInterval(() => {
-                createEnemy();
-            }, 3000);
-
-            // Start moving enemies
-            setInterval(() => {
-                moveEnemies();
-                checkEncounter();
-            }, 1000);
-        }
-
-        // Run game
-        initGame();
-    </script>
+    function createSnakeTeeth() {
+      const teethContainer = document.createElement("div");
+      teethContainer.classList.add("snake-teeth");
+      for (let i = 0; i < 4; i++) {
+        const tooth = document.createElement("div");
+        tooth.classList.add("grid-item");
+        teethContainer.appendChild(tooth);
+      }
+      return teethContainer;
+    }
+  </script>
 </body>
 </html>
