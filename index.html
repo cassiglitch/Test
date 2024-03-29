@@ -3,54 +3,132 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Browser Zoom Level Detector</title>
+<title>Slime Snake</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    position: absolute; /* Set position to absolute */
-    width: 100%; /* Occupy full width of the viewport */
-    height: 100%; /* Occupy full height of the viewport */
-    overflow: hidden; /* Prevent horizontal and vertical scrolling */
+    overflow: hidden;
+    background-color: #f0f0f0;
   }
-  
-  * {
-    transform-origin: top left; /* Set transform origin to top left for all elements */
-  }
-  
-  p {
-    margin: 0; /* Remove default margins for consistent display */
-    font-size: 16px; /* Adjust font size for readability */
-    white-space: pre-wrap; /* Preserve line breaks */
+  canvas {
+    display: block;
+    margin: auto;
+    background-color: #ffffff;
   }
 </style>
 </head>
 <body>
-<div id="content">
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque sollicitudin tortor in lacus tincidunt volutpat. Integer dignissim imperdiet mollis. Suspendisse quis tortor velit, placerat tempor neque. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Praesent bibendum auctor lorem vitae tempor. Nullam condimentum aliquam elementum. Nullam egestas gravida elementum. Maecenas mattis molestie nisl sit amet vehicula. Donec semper tristique blandit. Vestibulum adipiscing placerat mollis.</p>
-</div>
-
+<canvas id="gameCanvas" width="600" height="400"></canvas>
 <script>
-function applyAntiZoom() {
-  var deviceWidth, landscape = Math.abs(window.orientation) == 90
-  // workaround for strange screen.height on the iPhone (v3.1.3)
-  if (window.screen.width == 320) deviceWidth = landscape ? 480 : 320
-  else deviceWidth = window.screen[landscape ? "height" : "width"]
-  var zoomFactor = deviceWidth / window.innerWidth;
-  var antiZoomFactor = 1 / zoomFactor;
-  
-  // Apply anti-zoom effect to all elements
-  if (antiZoomFactor !== 1) {
-    document.body.style.transform = 'scale(' + antiZoomFactor.toFixed(2) + ')';
-  } else {
-    document.body.style.transform = 'none';
-  }
-}
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
 
-// Call the function initially and then refresh every second
-applyAntiZoom(); // Call initially
-setInterval(applyAntiZoom, 1); // Refresh every second
+  const cellSize = 20;
+  const gridSizeX = Math.floor(canvas.width / cellSize);
+  const gridSizeY = Math.floor(canvas.height / cellSize);
+
+  let snake = [{x: 10, y: 10}];
+  let dx = 1;
+  let dy = 0;
+  let slimeTrail = [];
+
+  function drawSlimeTrail() {
+    ctx.fillStyle = 'lime';
+    for (const cell of slimeTrail) {
+      ctx.fillRect(cell.x * cellSize, cell.y * cellSize, cellSize, cellSize);
+    }
+  }
+
+  function drawSnake() {
+    ctx.fillStyle = 'green';
+    for (const segment of snake) {
+      ctx.fillRect(segment.x * cellSize, segment.y * cellSize, cellSize, cellSize);
+    }
+  }
+
+  function moveSnake() {
+    const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+    if (head.x < 0 || head.x >= gridSizeX || head.y < 0 || head.y >= gridSizeY) {
+      // Snake hits the wall, wrap around or end game
+      // For now, let's just wrap around
+      if (head.x < 0) head.x = gridSizeX - 1;
+      if (head.x >= gridSizeX) head.x = 0;
+      if (head.y < 0) head.y = gridSizeY - 1;
+      if (head.y >= gridSizeY) head.y = 0;
+    }
+
+    // Check if snake hits itself
+    if (snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+      // Game over
+      alert('Game over!');
+      location.reload();
+    }
+
+    snake.unshift(head);
+
+    if (slimeTrail.length > snake.length) {
+      slimeTrail.pop();
+    }
+
+    // Check if the snake is touching a wall
+    if ((head.x === 0 || head.x === gridSizeX - 1) && snake.length > 1) {
+      // Snake is touching a wall, enable wall crawling
+      // Let's assume the snake can crawl up walls indefinitely for simplicity
+      dy = 0; // Disable vertical movement
+      if (head.x === 0) {
+        // Snake is touching left wall, move right
+        dx = 1;
+      } else {
+        // Snake is touching right wall, move left
+        dx = -1;
+      }
+    }
+
+    // Update slime trail
+    slimeTrail.unshift({x: head.x, y: head.y});
+
+    // Draw everything
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawSlimeTrail();
+    drawSnake();
+  }
+
+  function gameLoop() {
+    moveSnake();
+    requestAnimationFrame(gameLoop);
+  }
+
+  // Control snake movement with arrow keys
+  document.addEventListener('keydown', e => {
+    switch (e.key) {
+      case 'ArrowUp':
+        if (dy === 0) {
+          dx = 0;
+          dy = -1;
+        }
+        break;
+      case 'ArrowDown':
+        if (dy === 0) {
+          dx = 0;
+          dy = 1;
+        }
+        break;
+      case 'ArrowLeft':
+        if (dx === 0) {
+          dx = -1;
+          dy = 0;
+        }
+        break;
+      case 'ArrowRight':
+        if (dx === 0) {
+          dx = 1;
+          dy = 0;
+        }
+        break;
+    }
+  });
+
+  gameLoop();
 </script>
 </body>
 </html>
