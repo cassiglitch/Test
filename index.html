@@ -49,7 +49,7 @@
   function moveSnake() {
     const head = {x: snake[0].x + dx, y: snake[0].y + dy};
     if (head.x < 0 || head.x >= gridSizeX || head.y < 0 || head.y >= gridSizeY) {
-      // Snake hits the wall, wrap around or end game
+      // Snake hits the wall, wrap around or climb up
       // For now, let's just wrap around
       if (head.x < 0) head.x = gridSizeX - 1;
       if (head.x >= gridSizeX) head.x = 0;
@@ -72,8 +72,8 @@
 
     // Check if the snake is touching a wall
     if ((head.x === 0 || head.x === gridSizeX - 1) && snake.length > 1) {
-      // Snake is touching a wall, enable wall crawling
-      // Let's assume the snake can crawl up walls indefinitely for simplicity
+      // Snake is touching a wall, enable wall climbing
+      // Let's assume the snake can climb up walls indefinitely for simplicity
       dy = 0; // Disable vertical movement
       if (head.x === 0) {
         // Snake is touching left wall, move right
