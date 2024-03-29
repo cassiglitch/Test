@@ -15,11 +15,11 @@
     .grid-item {
       width: 20px;
       height: 20px;
-      background-color: lightgreen;
+      background-color: darkgreen;
     }
 
     .snake-head {
-      background-color: green;
+      background-color: lightgreen;
       animation: swellAnimation 1s ease-in-out infinite alternate;
     }
 
@@ -38,15 +38,18 @@
     .snake-teeth {
       background-color: white;
       border: 1px solid black;
-      animation: biteAnimation 2s ease-in-out infinite alternate;
+      animation: biteAnimation 1s ease-in-out infinite alternate;
     }
 
     @keyframes biteAnimation {
-      0%, 100% {
+      0% {
         transform: scaleY(1);
       }
       50% {
         transform: scaleY(1.1);
+      }
+      100% {
+        transform: scaleY(1);
       }
     }
   </style>
