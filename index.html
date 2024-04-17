@@ -3,266 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyberpunk Roamer</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            overflow: hidden;
-        }
-
-        #game-container {
-            width: 100%;
-            height: 100vh;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #player {
-            width: 20px;
-            height: 20px;
-            background-color: #0f0;
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .platform {
-            width: 100px;
-            height: 10px;
-            background-color: #999;
-            position: absolute;
-        }
-
-        .enemy {
-            width: 20px;
-            height: 20px;
-            background-color: #f00;
-            position: absolute;
-            bottom: 0;
-        }
-    </style>
+    <title>WebRTC File and Text Transfer</title>
 </head>
 <body>
-    <div id="game-container">
-        <div id="player"></div>
-        <div id="platforms"></div>
+    <h1>WebRTC File and Text Transfer</h1>
+
+    <div id="sender">
+        <h2>Sender</h2>
+        <button id="sendFileButton">Send File (index.html)</button>
+        <form id="textForm">
+            <label for="textInput">Enter Text to Transmit:</label><br>
+            <input type="text" id="textInput" name="textInput"><br>
+            <input type="submit" value="Submit">
+        </form>
     </div>
+
+    <hr>
+
+    <div id="receiver">
+        <h2>Receiver</h2>
+        <div id="receivedContent"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9"></script>
     <script>
-        const player = document.getElementById('player');
-        const platformsContainer = document.getElementById('platforms');
+        // Initialize SimplePeer
+        const peer = new SimplePeer();
 
-        let playerX = 50; // Initial player position
-        let playerY = 0;
-        let platformSpeed = 1; // Speed of platform movement
-        let platforms = [];
-        let enemies = [];
-        let isJumping = false;
-        let isWallJumping = false;
-        let isRocketBoosting = false;
-        let grapplingHookActive = false;
+        peer.on('signal', data => {
+            // Log the signal data for debugging
+            console.log('Signal data:', data);
+        });
 
-        // Keyboard controls
-        document.addEventListener('keydown', function(event) {
-            if (event.code === 'ArrowLeft') {
-                movePlayer('left');
-            }
-            if (event.code === 'ArrowRight') {
-                movePlayer('right');
-            }
-            if (event.code === 'Space') {
-                if (!isJumping) {
-                    jump();
-                }
-            }
-            if (event.code === 'KeyW') {
-                // Fire weapon
-                fireWeapon();
-            }
-            if (event.code === 'KeyG') {
-                // Use grappling hook
-                useGrapplingHook();
+        peer.on('connect', () => {
+            console.log('Connection established.');
+        });
+
+        peer.on('data', data => {
+            // Detect if the received data is a file or text
+            if (typeof data === 'string') {
+                // Assume received data is text
+                const receivedText = new TextDecoder().decode(data);
+                document.getElementById('receivedContent').innerHTML += `<p>Received Text: ${receivedText}</p>`;
+            } else {
+                // Assume received data is a file
+                const blob = new Blob([data], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const iframe = document.createElement('iframe');
+                iframe.src = url;
+                iframe.style.width = '100%';
+                iframe.style.height = '400px';
+                document.getElementById('receivedContent').appendChild(iframe);
             }
         });
 
-        function createPlatform() {
-            const platform = document.createElement('div');
-            platform.classList.add('platform');
-            const platformWidth = Math.floor(Math.random() * 100) + 50; // Random platform width
-            const platformX = Math.random() * (100 - platformWidth); // Random platform position
-            platform.style.width = platformWidth + 'px';
-            platform.style.left = platformX + '%';
-            platformsContainer.appendChild(platform);
-            platforms.push(platform);
-        }
-
-        function createEnemy() {
-            const enemy = document.createElement('div');
-            enemy.classList.add('enemy');
-            enemy.style.left = Math.random() * 90 + 5 + '%'; // Random enemy position
-            platformsContainer.appendChild(enemy);
-            enemies.push(enemy);
-        }
-
-        function updatePlatforms() {
-            platforms.forEach(platform => {
-                const platformY = parseFloat(platform.style.bottom);
-                const newPlatformY = platformY + platformSpeed;
-                platform.style.bottom = newPlatformY + '%';
-                if (newPlatformY > 100) {
-                    platform.remove();
-                    const index = platforms.indexOf(platform);
-                    platforms.splice(index, 1);
-                    createPlatform(); // Add a new platform when one is removed
-                }
-            });
-        }
-
-        function updateEnemies() {
-            enemies.forEach(enemy => {
-                const enemyY = parseFloat(enemy.style.bottom);
-                const newEnemyY = enemyY + platformSpeed;
-                enemy.style.bottom = newEnemyY + '%';
-                if (newEnemyY > 100) {
-                    enemy.remove();
-                    const index = enemies.indexOf(enemy);
-                    enemies.splice(index, 1);
-                    createEnemy(); // Add a new enemy when one is removed
-                }
-            });
-        }
-
-        function jump() {
-            isJumping = true;
-            let jumpHeight = 50; // Height of jump
-            let jumpSpeed = 2; // Speed of jump
-            let interval = setInterval(function() {
-                if (jumpHeight > 0) {
-                    playerY += jumpSpeed;
-                    player.style.bottom = playerY + '%';
-                    jumpHeight -= jumpSpeed;
-                } else {
-                    clearInterval(interval);
-                    isJumping = false;
-                    fall();
-                }
-            }, 20);
-        }
-
-        function fall() {
-            let fallSpeed = 1; // Speed of fall
-            let interval = setInterval(function() {
-                if (playerY > 0) {
-                    playerY -= fallSpeed;
-                    player.style.bottom = playerY + '%';
-                } else {
-                    clearInterval(interval);
-                }
-            }, 20);
-        }
-
-        function movePlayer(direction) {
-            const step = 5; // Movement step size
-            if (direction === 'left') {
-                playerX -= step;
-                player.style.left = playerX + '%';
-            } else if (direction === 'right') {
-                playerX += step;
-                player.style.left = playerX + '%';
-            }
-        }
-
-        function fireWeapon() {
-            // Implement weapon firing mechanics
-            // For now, we'll just create a bullet element and animate it
-            const bullet = document.createElement('div');
-            bullet.classList.add('bullet');
-            bullet.style.bottom = '25%'; // Initial position of the bullet
-            bullet.style.left = playerX + '%'; // Position the bullet horizontally aligned with the player
-            platformsContainer.appendChild(bullet);
-
-            const bulletSpeed = 5; // Speed of the bullet
-            const bulletInterval = setInterval(() => {
-                const bulletY = parseFloat(bullet.style.bottom);
-                const newBulletY = bulletY + bulletSpeed;
-                bullet.style.bottom = newBulletY + '%';
-                
-                // Check for collision with enemies
-                enemies.forEach(enemy => {
-                    const enemyRect = enemy.getBoundingClientRect();
-                    const bulletRect = bullet.getBoundingClientRect();
-                    if (isColliding(enemyRect, bulletRect)) {
-                        // Remove the enemy and the bullet upon collision
-                        enemy.remove();
-                        bullet.remove();
-                        const enemyIndex = enemies.indexOf(enemy);
-                        enemies.splice(enemyIndex, 1);
-                    }
+        // Function to send the file (index.html) to the receiver
+        const sendFileToReceiver = () => {
+            fetch('index.html')
+                .then(response => response.arrayBuffer())
+                .then(buffer => {
+                    // Send the file over the data channel
+                    peer.send(buffer);
+                    console.log('File (index.html) sent.');
+                })
+                .catch(error => {
+                    console.error('Error reading file (index.html):', error);
                 });
+        };
 
-                // Remove bullet when it reaches the top of the screen
-                if (newBulletY > 100) {
-                    bullet.remove();
-                    clearInterval(bulletInterval);
-                }
-            }, 20);
-        }
+        // Automatically send the file when the page loads
+        window.addEventListener('load', sendFileToReceiver);
 
-        function useGrapplingHook() {
-            // Implement grappling hook mechanics
-            if (!grapplingHookActive) {
-                grapplingHookActive = true;
-                // For now, we'll just move the player upwards rapidly
-                const grapplingHookSpeed = 5; // Speed of grappling hook
-                let grapplingHookHeight = 0; // Height of grappling hook movement
-                const grapplingHookInterval = setInterval(() => {
-                    if (grapplingHookHeight < 50) { // Maximum height of grappling hook movement
-                        playerY += grapplingHookSpeed;
-                        player.style.bottom = playerY + '%';
-                        grapplingHookHeight += grapplingHookSpeed;
-                    } else {
-                        grapplingHookActive = false;
-                        clearInterval(grapplingHookInterval);
-                    }
-                }, 20);
-            }
-        }
+        // Setup event listener for the send file button
+        document.getElementById('sendFileButton').addEventListener('click', sendFileToReceiver);
 
-        function isColliding(rect1, rect2) {
-            return !(rect1.right < rect2.left || 
-                     rect1.left > rect2.right || 
-                     rect1.bottom < rect2.top || 
-                     rect1.top > rect2.bottom);
-        }
-
-        function generateNextLevel() {
-            // Increase platform difficulty or add new mechanics for next level
-            platformSpeed += 0.5; // Increase platform speed
-        }
-
-        function slidePlatforms() {
-            platforms.forEach(platform => {
-                const platformX = parseFloat(platform.style.left);
-                platform.style.left = (platformX - 1) + '%'; // Slide platforms to the left
-            });
-        }
-
-        function gameLoop() {
-            updatePlatforms();
-            updateEnemies();
-            slidePlatforms();
-            requestAnimationFrame(gameLoop);
-        }
-
-        function init() {
-            createPlatform();
-            createEnemy();
-            gameLoop();
-        }
-
-        init();
+        // Setup event listener for the text form submission
+        document.getElementById('textForm').addEventListener('submit', event => {
+            event.preventDefault();
+            const textInput = document.getElementById('textInput').value;
+            // Send the text over the data channel
+            peer.send(textInput);
+            console.log('Text sent:', textInput);
+            // Clear the text input
+            document.getElementById('textInput').value = '';
+        });
     </script>
 </body>
 </html>
