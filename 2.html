@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <script>
+        // Define the canvas and context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Define the enemy class
+        class Enemy {
+            constructor(x, y, speed) {
+                this.x = x;
+                this.y = y;
+                this.speed = speed;
+            }
+
+            // Update the enemy position
+            update() {
+                // Implement enemy AI here (e.g., move towards the player's position)
+                // For demonstration purposes, let's just move randomly
+                this.x += (Math.random() - 0.5) * this.speed;
+                this.y += (Math.random() - 0.5) * this.speed;
+            }
+
+            // Render the enemy
+            render() {
+                ctx.fillStyle = 'red';
+                ctx.fillRect(this.x, this.y, 10, 10);
+            }
+        }
+
+        // Define the enemies array
+        const enemies = [];
+
+        // Function to initialize enemies
+        function initEnemies(numEnemies) {
+            for (let i = 0; i < numEnemies; i++) {
+                // Randomize enemy position and speed
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const speed = Math.random() * 2 + 1; // Random speed between 1 and 3
+                enemies.push(new Enemy(x, y, speed));
+            }
+        }
+
+        // Function to update enemies
+        function updateEnemies() {
+            enemies.forEach(enemy => {
+                enemy.update();
+            });
+        }
+
+        // Function to render enemies
+        function renderEnemies() {
+            enemies.forEach(enemy => {
+                enemy.render();
+            });
+        }
+
+        // Game loop
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            updateEnemies(); // Update enemies
+            renderEnemies(); // Render enemies
+            requestAnimationFrame(gameLoop); // Request next frame
+        }
+
+        // Initialize the game
+        initEnemies(5); // Initialize 5 enemies
+        gameLoop(); // Start the game loop
+    </script>
+</body>
+</html>
