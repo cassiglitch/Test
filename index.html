@@ -1,123 +1,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Enemies Snake Game</title>
-<style>
-    canvas {
-        border: 1px solid black;
-        background-color: #f0f0f0;
-        display: block;
-        margin: 0 auto;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Roamer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #player {
+            width: 20px;
+            height: 20px;
+            background-color: #0f0;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .platform {
+            width: 100px;
+            height: 10px;
+            background-color: #999;
+            position: absolute;
+        }
+
+        .enemy {
+            width: 20px;
+            height: 20px;
+            background-color: #f00;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
 </head>
 <body>
-<canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="game-container">
+        <div id="player"></div>
+        <div id="platforms"></div>
+    </div>
+    <script>
+        const player = document.getElementById('player');
+        const platformsContainer = document.getElementById('platforms');
 
-<script>
-// Enemies module
-const Enemies = (function() {
-    let enemies = [];
+        let playerX = 50; // Initial player position
+        let playerY = 0;
+        let platformSpeed = 1; // Speed of platform movement
+        let platforms = [];
+        let enemies = [];
+        let isJumping = false;
+        let isWallJumping = false;
+        let isRocketBoosting = false;
+        let grapplingHookActive = false;
 
-    function createEnemy(x, y, speed) {
-        return {
-            x,
-            y,
-            speed,
-            update() {
-                // Implement smart behavior here
-                // For example, move towards the player or avoid obstacles
-                // For simplicity, let's make them move randomly
-                const direction = Math.floor(Math.random() * 4);
-                switch(direction) {
-                    case 0: // Move up
-                        this.y -= this.speed;
-                        break;
-                    case 1: // Move down
-                        this.y += this.speed;
-                        break;
-                    case 2: // Move left
-                        this.x -= this.speed;
-                        break;
-                    case 3: // Move right
-                        this.x += this.speed;
-                        break;
-                }
-            },
-            draw(context) {
-                context.fillStyle = 'red';
-                context.fillRect(this.x, this.y, 10, 10);
+        // Keyboard controls
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'ArrowLeft') {
+                movePlayer('left');
             }
-        };
-    }
+            if (event.code === 'ArrowRight') {
+                movePlayer('right');
+            }
+            if (event.code === 'Space') {
+                if (!isJumping) {
+                    jump();
+                }
+            }
+            if (event.code === 'KeyW') {
+                // Fire weapon
+                fireWeapon();
+            }
+            if (event.code === 'KeyG') {
+                // Use grappling hook
+                useGrapplingHook();
+            }
+        });
 
-    function addEnemy(x, y, speed) {
-        const enemy = createEnemy(x, y, speed);
-        enemies.push(enemy);
-    }
+        function createPlatform() {
+            const platform = document.createElement('div');
+            platform.classList.add('platform');
+            const platformWidth = Math.floor(Math.random() * 100) + 50; // Random platform width
+            const platformX = Math.random() * (100 - platformWidth); // Random platform position
+            platform.style.width = platformWidth + 'px';
+            platform.style.left = platformX + '%';
+            platformsContainer.appendChild(platform);
+            platforms.push(platform);
+        }
 
-    function updateAll() {
-        enemies.forEach(enemy => enemy.update());
-    }
+        function createEnemy() {
+            const enemy = document.createElement('div');
+            enemy.classList.add('enemy');
+            enemy.style.left = Math.random() * 90 + 5 + '%'; // Random enemy position
+            platformsContainer.appendChild(enemy);
+            enemies.push(enemy);
+        }
 
-    function drawAll(context) {
-        enemies.forEach(enemy => enemy.draw(context));
-    }
+        function updatePlatforms() {
+            platforms.forEach(platform => {
+                const platformY = parseFloat(platform.style.bottom);
+                const newPlatformY = platformY + platformSpeed;
+                platform.style.bottom = newPlatformY + '%';
+                if (newPlatformY > 100) {
+                    platform.remove();
+                    const index = platforms.indexOf(platform);
+                    platforms.splice(index, 1);
+                    createPlatform(); // Add a new platform when one is removed
+                }
+            });
+        }
 
-    return {
-        addEnemy,
-        updateAll,
-        drawAll
-    };
-})();
+        function updateEnemies() {
+            enemies.forEach(enemy => {
+                const enemyY = parseFloat(enemy.style.bottom);
+                const newEnemyY = enemyY + platformSpeed;
+                enemy.style.bottom = newEnemyY + '%';
+                if (newEnemyY > 100) {
+                    enemy.remove();
+                    const index = enemies.indexOf(enemy);
+                    enemies.splice(index, 1);
+                    createEnemy(); // Add a new enemy when one is removed
+                }
+            });
+        }
 
-// Game module
-const Game = (function() {
-    let canvas, context, playerX, playerY;
+        function jump() {
+            isJumping = true;
+            let jumpHeight = 50; // Height of jump
+            let jumpSpeed = 2; // Speed of jump
+            let interval = setInterval(function() {
+                if (jumpHeight > 0) {
+                    playerY += jumpSpeed;
+                    player.style.bottom = playerY + '%';
+                    jumpHeight -= jumpSpeed;
+                } else {
+                    clearInterval(interval);
+                    isJumping = false;
+                    fall();
+                }
+            }, 20);
+        }
 
-    function init() {
-        canvas = document.getElementById('gameCanvas');
-        context = canvas.getContext('2d');
+        function fall() {
+            let fallSpeed = 1; // Speed of fall
+            let interval = setInterval(function() {
+                if (playerY > 0) {
+                    playerY -= fallSpeed;
+                    player.style.bottom = playerY + '%';
+                } else {
+                    clearInterval(interval);
+                }
+            }, 20);
+        }
 
-        playerX = canvas.width / 2;
-        playerY = canvas.height / 2;
+        function movePlayer(direction) {
+            const step = 5; // Movement step size
+            if (direction === 'left') {
+                playerX -= step;
+                player.style.left = playerX + '%';
+            } else if (direction === 'right') {
+                playerX += step;
+                player.style.left = playerX + '%';
+            }
+        }
 
-        // Add some enemies
-        Enemies.addEnemy(50, 50, 1);
-        Enemies.addEnemy(200, 100, 2);
-        Enemies.addEnemy(300, 300, 1);
+        function fireWeapon() {
+            // Implement weapon firing mechanics
+            // For now, we'll just create a bullet element and animate it
+            const bullet = document.createElement('div');
+            bullet.classList.add('bullet');
+            bullet.style.bottom = '25%'; // Initial position of the bullet
+            bullet.style.left = playerX + '%'; // Position the bullet horizontally aligned with the player
+            platformsContainer.appendChild(bullet);
 
-        // Start the game loop
-        setInterval(update, 1000 / 30); // 30 frames per second
-    }
+            const bulletSpeed = 5; // Speed of the bullet
+            const bulletInterval = setInterval(() => {
+                const bulletY = parseFloat(bullet.style.bottom);
+                const newBulletY = bulletY + bulletSpeed;
+                bullet.style.bottom = newBulletY + '%';
+                
+                // Check for collision with enemies
+                enemies.forEach(enemy => {
+                    const enemyRect = enemy.getBoundingClientRect();
+                    const bulletRect = bullet.getBoundingClientRect();
+                    if (isColliding(enemyRect, bulletRect)) {
+                        // Remove the enemy and the bullet upon collision
+                        enemy.remove();
+                        bullet.remove();
+                        const enemyIndex = enemies.indexOf(enemy);
+                        enemies.splice(enemyIndex, 1);
+                    }
+                });
 
-    function update() {
-        clearCanvas();
-        Enemies.updateAll();
-        Enemies.drawAll(context);
+                // Remove bullet when it reaches the top of the screen
+                if (newBulletY > 100) {
+                    bullet.remove();
+                    clearInterval(bulletInterval);
+                }
+            }, 20);
+        }
 
-        // Draw player
-        drawPlayer();
-    }
+        function useGrapplingHook() {
+            // Implement grappling hook mechanics
+            if (!grapplingHookActive) {
+                grapplingHookActive = true;
+                // For now, we'll just move the player upwards rapidly
+                const grapplingHookSpeed = 5; // Speed of grappling hook
+                let grapplingHookHeight = 0; // Height of grappling hook movement
+                const grapplingHookInterval = setInterval(() => {
+                    if (grapplingHookHeight < 50) { // Maximum height of grappling hook movement
+                        playerY += grapplingHookSpeed;
+                        player.style.bottom = playerY + '%';
+                        grapplingHookHeight += grapplingHookSpeed;
+                    } else {
+                        grapplingHookActive = false;
+                        clearInterval(grapplingHookInterval);
+                    }
+                }, 20);
+            }
+        }
 
-    function clearCanvas() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-    }
+        function isColliding(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                     rect1.left > rect2.right || 
+                     rect1.bottom < rect2.top || 
+                     rect1.top > rect2.bottom);
+        }
 
-    function drawPlayer() {
-        context.fillStyle = 'green';
-        context.fillRect(playerX, playerY, 10, 10);
-    }
+        function generateNextLevel() {
+            // Increase platform difficulty or add new mechanics for next level
+            platformSpeed += 0.5; // Increase platform speed
+        }
 
-    return {
-        init
-    };
-})();
+        function slidePlatforms() {
+            platforms.forEach(platform => {
+                const platformX = parseFloat(platform.style.left);
+                platform.style.left = (platformX - 1) + '%'; // Slide platforms to the left
+            });
+        }
 
-// Initialize the game
-Game.init();
-</script>
+        function gameLoop() {
+            updatePlatforms();
+            updateEnemies();
+            slidePlatforms();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function init() {
+            createPlatform();
+            createEnemy();
+            gameLoop();
+        }
+
+        init();
+    </script>
 </body>
 </html>
