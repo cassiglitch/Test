@@ -1,75 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snake Bite Animation</title>
-  <style>
-    #grid {
-      width: 200px;
-      height: 200px;
-      display: grid;
-      grid-template-columns: repeat(20, 10px); /* Adjust based on desired grid size */
-      grid-template-rows: repeat(20, 10px);
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Enemies Snake Game</title>
+<style>
+    canvas {
+        border: 1px solid black;
+        background-color: #f0f0f0;
+        display: block;
+        margin: 0 auto;
     }
-
-    .snake-head {
-      background-color: lightgreen;
-      grid-column: 10 / span 1; /* Adjust grid position for head */
-      grid-row: 10 / span 1;
-    }
-
-    .snake-head.open {
-      background-color: lightgreen;
-      grid-column: 10;
-      grid-row: 10;
-      border-radius: 50%;
-      /* Add details for open mouth here (optional) */
-      /* Example: border-bottom: 5px solid red; */
-    }
-
-    .snake-open-top {
-      background-color: lightgreen;
-      grid-column: 9 / span 2;
-      grid-row: 9;
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-    }
-
-    .snake-open-bottom {
-      background-color: lightgreen;
-      grid-column: 9 / span 2;
-      grid-row: 11;
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
-  </style>
+</style>
 </head>
 <body>
-  <div id="grid"></div>
-  <script>
-    const grid = document.getElementById('grid');
-    const head = document.querySelector('.snake-head');
+<canvas id="gameCanvas" width="400" height="400"></canvas>
 
-    let open = false;
+<script>
+// Enemies module
+const Enemies = (function() {
+    let enemies = [];
 
-    function animateBite() {
-      open = !open;
-
-      head.classList.toggle('open');
-
-      if (open) {
-        grid.classList.add('snake-open-top');
-        grid.classList.add('snake-open-bottom');
-      } else {
-        grid.classList.remove('snake-open-top');
-        grid.classList.remove('snake-open-bottom');
-      }
-
-      setTimeout(animateBite, 200); // Adjust animation speed
+    function createEnemy(x, y, speed) {
+        return {
+            x,
+            y,
+            speed,
+            update() {
+                // Implement smart behavior here
+                // For example, move towards the player or avoid obstacles
+                // For simplicity, let's make them move randomly
+                const direction = Math.floor(Math.random() * 4);
+                switch(direction) {
+                    case 0: // Move up
+                        this.y -= this.speed;
+                        break;
+                    case 1: // Move down
+                        this.y += this.speed;
+                        break;
+                    case 2: // Move left
+                        this.x -= this.speed;
+                        break;
+                    case 3: // Move right
+                        this.x += this.speed;
+                        break;
+                }
+            },
+            draw(context) {
+                context.fillStyle = 'red';
+                context.fillRect(this.x, this.y, 10, 10);
+            }
+        };
     }
 
-    animateBite();
-  </script>
+    function addEnemy(x, y, speed) {
+        const enemy = createEnemy(x, y, speed);
+        enemies.push(enemy);
+    }
+
+    function updateAll() {
+        enemies.forEach(enemy => enemy.update());
+    }
+
+    function drawAll(context) {
+        enemies.forEach(enemy => enemy.draw(context));
+    }
+
+    return {
+        addEnemy,
+        updateAll,
+        drawAll
+    };
+})();
+
+// Game module
+const Game = (function() {
+    let canvas, context, playerX, playerY;
+
+    function init() {
+        canvas = document.getElementById('gameCanvas');
+        context = canvas.getContext('2d');
+
+        playerX = canvas.width / 2;
+        playerY = canvas.height / 2;
+
+        // Add some enemies
+        Enemies.addEnemy(50, 50, 1);
+        Enemies.addEnemy(200, 100, 2);
+        Enemies.addEnemy(300, 300, 1);
+
+        // Start the game loop
+        setInterval(update, 1000 / 30); // 30 frames per second
+    }
+
+    function update() {
+        clearCanvas();
+        Enemies.updateAll();
+        Enemies.drawAll(context);
+
+        // Draw player
+        drawPlayer();
+    }
+
+    function clearCanvas() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function drawPlayer() {
+        context.fillStyle = 'green';
+        context.fillRect(playerX, playerY, 10, 10);
+    }
+
+    return {
+        init
+    };
+})();
+
+// Initialize the game
+Game.init();
+</script>
 </body>
 </html>
