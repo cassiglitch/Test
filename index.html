@@ -137,20 +137,18 @@
         }
 
         function makeMove(index) {
-            if (!board[index]) {
+            if (!board[index] && !checkWinner()) {
                 document.getElementsByClassName("cell")[index].innerText = currentPlayer;
                 board[index] = currentPlayer;
                 if (checkWinner()) {
                     document.getElementById("tttResult").innerText = currentPlayer + " wins!";
-                    return;
-                }
-                if (!board.includes("")) {
+                } else if (!board.includes("")) {
                     document.getElementById("tttResult").innerText = "It's a tie!";
-                    return;
-                }
-                currentPlayer = currentPlayer === "X" ? "O" : "X";
-                if (currentPlayer === "O") {
-                    makeAIMove();
+                } else {
+                    currentPlayer = currentPlayer === "X" ? "O" : "X";
+                    if (currentPlayer === "O") {
+                        makeAIMove();
+                    }
                 }
             }
         }
