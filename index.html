@@ -72,7 +72,7 @@
         case 'stringToHex':
           return stringToColour(color);
         case 'hexToString':
-          return tinycolor(color).toString('hex');
+          return `'${tinycolor(color).name()}'`;
         case 'hexToRgb':
           return hexToRgb(color);
         case 'rgbToHex':
