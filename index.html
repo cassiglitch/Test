@@ -14,18 +14,20 @@
 
     // Function to convert color
     function convertColor(color, conversionType) {
-      const stringToColour = (str) => {
-        let hash = 0;
-        str.split('').forEach((char) => {
-          hash = char.charCodeAt(0) + ((hash << 5) - hash);
-        });
-        let colour = '#';
-        for (let i = 0; i < 3; i++) {
-          const value = (hash >> (i * 8)) & 0xff;
-          colour += value.toString(16).padStart(2, '0');
-        }
-        return colour;
-      };
+const stringToColour = (str) => {
+  let hash = 0;
+  if (str.length === 0) return '#000000'; // Return black for empty strings
+  
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char; // Update hash based on character code
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  // Convert hash to a valid hex color
+  const colour = '#' + (hash & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, '0');
+  return colour;
+};
 
       const colourToString = (colour) => {
         const hex = colour.replace('#', '');
