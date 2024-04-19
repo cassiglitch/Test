@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Color Conversion</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js"></script>
 </head>
 <body>
   <canvas id="colorCanvas" width="400" height="400"></canvas>
@@ -64,8 +65,7 @@
       };
 
       const rgbToString = (r, g, b) => {
-        const hexColor = rgbToHex(r, g, b);
-        return colourToString(hexColor);
+        return tinycolor({ r, g, b }).toString();
       };
 
       switch (conversionType) {
