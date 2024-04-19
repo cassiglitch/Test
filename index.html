@@ -72,7 +72,7 @@
         case 'stringToHex':
           return stringToColour(color);
         case 'hexToString':
-          return colourToString(color);
+          return tinycolor(color).toString('hex');
         case 'hexToRgb':
           return hexToRgb(color);
         case 'rgbToHex':
