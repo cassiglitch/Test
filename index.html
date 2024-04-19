@@ -1,120 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Color Conversion</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tinycolor/1.4.2/tinycolor.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issac's GitHub Pages Hub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .site-link {
+            display: inline-block;
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .site-link:hover {
+            background-color: #2980b9;
+        }
+    </style>
 </head>
 <body>
-  <canvas id="colorCanvas" width="400" height="400"></canvas>
-  <script>
-    const canvas = document.getElementById('colorCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // Function to convert color
-    function convertColor(color, conversionType) {
-const stringToColour = (str) => {
-  let hash = 0;
-  if (str.length === 0) return '#000000'; // Return black for empty strings
-  
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char; // Update hash based on character code
-    hash |= 0; // Convert to 32bit integer
-  }
-
-  // Convert hash to a valid hex color
-  const colour = '#' + (hash & 0x00FFFFFF).toString(16).toUpperCase().padStart(6, '0');
-  return colour;
-};
-
-      const colourToString = (colour) => {
-        const hex = colour.replace('#', '');
-        let str = '';
-        for (let i = 0; i < hex.length; i += 2) {
-          const pair = hex.substr(i, 2);
-          const decimal = parseInt(pair, 16);
-          const char = String.fromCharCode(decimal);
-          str += char;
-        }
-        return str;
-      };
-
-      const componentToHex = (c) => {
-        const hex = c.toString(16);
-        return hex.length == 1 ? '0' + hex : hex;
-      };
-
-      const rgbToHex = (r, g, b) => {
-        return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b);
-      };
-
-      const hexToRgb = (hex) => {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result
-          ? {
-              r: parseInt(result[1], 16),
-              g: parseInt(result[2], 16),
-              b: parseInt(result[3], 16),
-            }
-          : null;
-      };
-
-      const stringToRgb = (str) => {
-        const hexColor = stringToColour(str);
-        return hexToRgb(hexColor);
-      };
-
-      const rgbToString = (r, g, b) => {
-        return tinycolor({ r, g, b }).toString();
-      };
-
-      switch (conversionType) {
-        case 'stringToHex':
-          return stringToColour(color);
-        case 'hexToString':
-          return colourToString(color);
-        case 'hexToRgb':
-          return hexToRgb(color);
-        case 'rgbToHex':
-          return rgbToHex(color.r, color.g, color.b);
-        case 'stringToRgb':
-          return stringToRgb(color);
-        case 'rgbToString':
-          return rgbToString(color.r, color.g, color.b);
-        default:
-          return 'Invalid conversion type';
-      }
-    }
-
-    // Perform color conversion
-    const stringToHex = convertColor('blue', 'stringToHex');
-    const hexToString = convertColor('#0000FF', 'hexToString');
-    const hexToRgbConversion = convertColor('#0000FF', 'hexToRgb');
-    const rgbToHexConversion = convertColor({ r: 0, g: 0, b: 255 }, 'rgbToHex');
-    const stringToRgbConversion = convertColor('blue', 'stringToRgb');
-    const rgbToStringConversion = convertColor({ r: 0, g: 0, b: 255 }, 'rgbToString');
-
-    // Display the conversions
-    ctx.font = '16px Arial';
-    ctx.fillStyle = stringToHex;
-    ctx.fillText('stringToHex: ' + stringToHex, 20, 40);
-
-    ctx.fillStyle = hexToString;
-    ctx.fillText('hexToString: ' + hexToString, 20, 80);
-
-    ctx.fillStyle = `rgb(${hexToRgbConversion.r}, ${hexToRgbConversion.g}, ${hexToRgbConversion.b})`;
-    ctx.fillText('hexToRgb: ' + JSON.stringify(hexToRgbConversion), 20, 120);
-
-    ctx.fillStyle = rgbToHexConversion;
-    ctx.fillText('rgbToHex: ' + rgbToHexConversion, 20, 160);
-
-    ctx.fillStyle = `rgb(${stringToRgbConversion.r}, ${stringToRgbConversion.g}, ${stringToRgbConversion.b})`;
-    ctx.fillText('stringToRgb: ' + JSON.stringify(stringToRgbConversion), 20, 200);
-
-    ctx.fillStyle = rgbToStringConversion;
-    ctx.fillText('rgbToString: ' + rgbToStringConversion, 20, 240);
-  </script>
+    <div class="container">
+        <h1>Issac's GitHub Pages Hub</h1>
+        <p>Welcome to my GitHub Pages hub! Below are links to my projects:</p>
+        <a href="https://cassiglitch.github.io/devicedetecttest/" class="site-link">Device Detect Test</a>
+        <a href="https://cassiglitch.github.io/snake/" class="site-link">Snake Game</a>
+    </div>
 </body>
 </html>
