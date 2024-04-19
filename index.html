@@ -52,30 +52,31 @@
         <hr>
         <h2>Feeling Bored?</h2>
         <p>Play a quick game of Rock, Paper, Scissors!</p>
+        <input type="text" id="userChoice" placeholder="Enter your choice">
         <button onclick="playGame()">Play</button>
         <p id="result"></p>
     </div>
 
     <script>
         function playGame() {
-            var choices = [Rock, Paper, Scissors];
+            var choices = ["rock", "paper", "scissors"];
             var computerChoice = choices[Math.floor(Math.random() * choices.length)];
-            var userChoice = prompt("Enter your choice (Rock, Paper, or Scissors):").toLowerCase();
+            var userChoice = document.getElementById("userChoice").value.toLowerCase();
             
             if (choices.includes(userChoice)) {
                 var result;
-                if (userChoice === computerChoice.toLowerCase()) {
+                if (userChoice === computerChoice) {
                     result = "It's a tie!";
-                } else if ((userChoice === "rock" && computerChoice === "Scissors") ||
-                           (userChoice === "paper" && computerChoice === "Rock") ||
-                           (userChoice === "scissors" && computerChoice === "Paper")) {
+                } else if ((userChoice === "rock" && computerChoice === "scissors") ||
+                           (userChoice === "paper" && computerChoice === "rock") ||
+                           (userChoice === "scissors" && computerChoice === "paper")) {
                     result = "You win! Computer chose " + computerChoice + ".";
                 } else {
                     result = "You lose! Computer chose " + computerChoice + ".";
                 }
                 document.getElementById("result").innerText = result;
             } else {
-                alert("Invalid choice! Please choose Rock, Paper, or Scissors.");
+                alert("Invalid choice! Please choose rock, paper, or scissors.");
             }
         }
     </script>
