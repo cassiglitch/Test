@@ -83,7 +83,7 @@
         <p>Welcome to my GitHub Pages hub! Below are links to my projects:</p>
         <a href="https://cassiglitch.github.io/loadingscreen/" class="site-link red">loading screen</a>
         <a href="https://cassiglitch.github.io/snake/" class="site-link blue">Snake Game</a>
-        
+
         <hr>
         <h2>Feeling Bored?</h2>
         <p>Play a quick game of Rock, Paper, Scissors!</p>
@@ -108,6 +108,17 @@
     </div>
 
     <script>
+
+        function redirect(){
+            // Redirect to the first link
+window.location.href = "https://cassiglitch.github.io/loadingscreen/";
+
+// After a certain time period (e.g., 5 seconds), redirect to another link
+setTimeout(function() {
+    window.location.href = "https://cassiglitch.github.io/snake/";
+}, 5000); // 5000 milliseconds = 5 seconds
+
+        }
         var currentPlayer = "X";
         var board = ["", "", "", "", "", "", "", "", ""];
 
