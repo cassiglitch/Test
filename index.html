@@ -109,57 +109,63 @@
     </div>
 
     <script>
-
-        function redirect(){
+        function redirect() {
             // Redirect to the first link
             window.location.href = "https://cassiglitch.github.io/loadingscreen/";
 
             // After a certain time period (e.g., 5 seconds), redirect to another link
             setTimeout(function() {
                 window.location.href = "https://cassiglitch.github.io/snake/";
-            }, 500); // 5000 milliseconds = 5 seconds
+            }, 5000); // 5000 milliseconds = 5 seconds
         }
 
         var currentPlayer = "X";
         var board = ["", "", "", "", "", "", "", "", ""];
+        var gameActive = true;
 
         function playRPS() {
             var choices = ["rock", "paper", "scissors"];
             var computerChoice = choices[Math.floor(Math.random() * choices.length)];
             var userChoice = document.getElementById("userChoice").value.toLowerCase();
-            
+            var rpsResult = document.getElementById("rpsResult");
+
             if (choices.includes(userChoice)) {
                 var result;
+                rpsResult.classList.remove("animation", "shake", "scale");
+
                 if (userChoice === computerChoice) {
                     result = "It's a tie!";
-                    document.getElementById("rpsResult").classList.add("animation", "shake");
+                    rpsResult.classList.add("animation", "shake");
                 } else if ((userChoice === "rock" && computerChoice === "scissors") ||
                            (userChoice === "paper" && computerChoice === "rock") ||
                            (userChoice === "scissors" && computerChoice === "paper")) {
                     result = "You win! Computer chose " + computerChoice + ".";
-                    document.getElementById("rpsResult").classList.add("animation", "scale");
+                    rpsResult.classList.add("animation", "scale");
                 } else {
                     result = "You lose! Computer chose " + computerChoice + ".";
-                    document.getElementById("rpsResult").classList.add("animation", "shake");
+                    rpsResult.classList.add("animation", "shake");
                 }
-                document.getElementById("rpsResult").innerText = result;
+                rpsResult.innerText = result;
             } else {
                 alert("Invalid choice! Please choose rock, paper, or scissors.");
             }
         }
 
         function makeMove(index) {
-            if (!board[index] && !checkWinner()) {
+            if (gameActive && !board[index]) {
                 document.getElementsByClassName("cell")[index].innerText = currentPlayer;
                 board[index] = currentPlayer;
+
                 if (checkWinner()) {
                     document.getElementById("tttResult").innerText = currentPlayer + " wins!";
+                    gameActive = false;
                 } else if (!board.includes("")) {
                     document.getElementById("tttResult").innerText = "It's a tie!";
+                    gameActive = false;
                 } else {
                     currentPlayer = currentPlayer === "X" ? "O" : "X";
                     if (currentPlayer === "O") {
-                        makeAIMove();
+                        setTimeout(makeAIMove, 500);
                     }
                 }
             }
