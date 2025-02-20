@@ -1,199 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Issac's GitHub Pages Hub</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f2f2f2;
-        }
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-        .site-link {
-            display: inline-block;
-            margin: 20px;
-            padding: 10px 20px;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        .site-link.red {
-            background-color: #e74c3c; /* Red */
-        }
-        .site-link.blue {
-            background-color: #3498db; /* Blue */
-        }
-        .site-link.green {
-            background-color: #2ecc71; /* Green */
-        }
-        .site-link:hover {
-            background-color: #555;
-        }
-        .animation {
-            animation-duration: 1s;
-            animation-timing-function: ease;
-            animation-iteration-count: 1;
-        }
-        @keyframes shake {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(-15deg); }
-            50% { transform: rotate(15deg); }
-            75% { transform: rotate(-15deg); }
-            100% { transform: rotate(0deg); }
-        }
-        @keyframes scale {
-            0% { transform: scale(0.8); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 5px;
-            margin-top: 20px;
-        }
-        .cell {
-            background-color: #ddd;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .cell:hover {
-            background-color: #ccc;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Issac's GitHub Pages Hub</title>
+  <style>
+    /* ===== Main Page Styles ===== */
+          body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+          }
+          .main-container {
+      max-width: 800px;
+      margin: 50px auto;
+      text-align: center;
+          }
+          h1 {
+      color: #333;
+          }
+          .site-link {
+      display: inline-block;
+      margin: 20px;
+      padding: 10px 20px;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+          }
+          .site-link.red {
+      background-color: #e74c3c;
+          }
+          .site-link.green {
+      background-color: #2ecc71;
+          }
+          .site-link:hover {
+      background-color: #555;
+          }
+          
+          /* ===== Custom Checkbox ("ball" vs. "Game") Styles ===== */
+          .container {
+      --UnChacked-color: hsl(0, 0%, 10%);
+      --chacked-color: hsl(216, 100%, 60%);
+      --font-color: white;
+      --chacked-font-color: var(--font-color);
+      --icon-size: 1.5em;
+      --anim-time: 0.2s;
+      --anim-scale: 0.1;
+      --base-radius: 0.8em;
+        
+      display: flex;
+      align-items: center;
+      position: relative;
+      cursor: pointer;
+      font-size: 20px;
+      user-select: none;
+      fill: var(--font-color);
+      color: var(--font-color);
+      margin: 0 10px;
+          }
+          .container input {
+      display: none;
+          }
+          .checkmark {
+      background: var(--UnChacked-color);
+      border-radius: var(--base-radius);
+      display: flex;
+      padding: 0.5em;
+      position: relative;
+          }
+          .icon {
+      width: var(--icon-size);
+      height: auto;
+      filter: drop-shadow(0px 2px var(--base-radius) rgba(0, 0, 0, 0.25));
+          }
+          .name {
+      margin: 0 0.25em;
+          }
+          .Yes {
+      width: 0;
+          }
+          .name.Yes {
+      display: none;
+          }
+          .container:hover .checkmark,
+          .container:hover .icon,
+          .container:hover .name {
+      transform: scale(calc(1 + var(--anim-scale)));
+          }
+          .container:active .checkmark,
+          .container:active .icon,
+          .container:active .name {
+      transform: scale(calc(1 - var(--anim-scale) / 2));
+      border-radius: calc(var(--base-radius) * 2);
+          }
+          .checkmark::before {
+      content: "";
+      opacity: 0.5;
+      transform: scale(1);
+      border-radius: var(--base-radius);
+      position: absolute;
+      box-sizing: border-box;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+          }
+          .checkmark:hover:before {
+      background-color: hsla(0, 0%, 50%, 0.2);
+          }
+          .container input:checked + .checkmark::before {
+      animation: boon calc(var(--anim-time)) ease;
+      animation-delay: calc(var(--anim-time) / 2);
+          }
+          .container input:checked + .checkmark {
+      --UnChacked-color: var(--chacked-color);
+      fill: var(--chacked-font-color);
+      color: var(--chacked-font-color);
+          }
+          .container input:checked ~ .checkmark .No {
+      width: 0;
+          }
+          .container input:checked ~ .checkmark .name.No {
+      display: none;
+          }
+          .container input:checked ~ .checkmark .Yes {
+      width: var(--icon-size);
+          }
+          .container input:checked ~ .checkmark .name.Yes {
+      width: auto;
+      display: unset;
+          }
+          .container,
+          .checkmark,
+          .checkmark:after,
+          .icon,
+          .checkmark .name {
+      transition: all var(--anim-time);
+          }
+          @keyframes icon-rot {
+      50% {
+        transform: rotateZ(180deg) scale(calc(1 - var(--anim-scale)));
+        border-radius: 1em;
+      }
+      to {
+        transform: rotate(360deg);
+        border-radius: var(--base-radius);
+      }
+          }
+          @keyframes boo {
+      80% {
+        transform: scale(1.4);
+      }
+      99% {
+        transform: scale(1.7);
+        border: 2px solid var(--UnChacked-color);
+      }
+      to {
+        transform: scale(0);
+      }
+          }
+          
+          /* ===== Switch Slider Styles ===== */
+          .switch {
+      font-size: 17px;
+      position: relative;
+      display: inline-block;
+      width: 3.5em;
+      height: 2em;
+      margin-left: 1em;
+          }
+          .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+          }
+          .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #9fccfa;
+      border-radius: 50px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          }
+          .slider:before {
+      position: absolute;
+      content: "";
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 2em;
+      width: 2em;
+      inset: 0;
+      background-color: white;
+      border-radius: 50px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          }
+          .switch input:checked + .slider {
+      background: #0974f1;
+          }
+          .switch input:focus + .slider {
+      box-shadow: 0 0 1px #0974f1;
+          }
+          .switch input:checked + .slider:before {
+      transform: translateX(1.6em);
+          }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Issac's GitHub Pages Hub</h1>
-        <p>Welcome to my GitHub Pages hub! Below are links to my projects:</p>
-        <a href="https://cassiglitch.github.io/loadingscreen/" class="site-link red">loading screen</a>
-        <a href="https://cassiglitch.github.io/snake/" class="site-link green">game</a>
-        <button onclick="redirect()" class="site-link blue">Snake Game</button>
-
-        <hr>
-        <h2>Feeling Bored?</h2>
-        <p>Play a quick game of Rock, Paper, Scissors!</p>
-        <input type="text" id="userChoice" placeholder="Enter your choice">
-        <button onclick="playRPS()">Play</button>
-        <p id="rpsResult"></p>
-
-        <hr>
-        <h2>Or try your luck in Tic Tac Toe against the AI:</h2>
-        <div class="board" id="board">
-            <div class="cell" onclick="makeMove(0)"></div>
-            <div class="cell" onclick="makeMove(1)"></div>
-            <div class="cell" onclick="makeMove(2)"></div>
-            <div class="cell" onclick="makeMove(3)"></div>
-            <div class="cell" onclick="makeMove(4)"></div>
-            <div class="cell" onclick="makeMove(5)"></div>
-            <div class="cell" onclick="makeMove(6)"></div>
-            <div class="cell" onclick="makeMove(7)"></div>
-            <div class="cell" onclick="makeMove(8)"></div>
+  <div class="main-container">
+    <h1>Issac's GitHub Pages Hub</h1>
+    <p>Welcome to my GitHub Pages hub! Below are links to my projects:</p>
+    <a href="https://cassiglitch.github.io/loadingscreen/" class="site-link red">loading screen</a>
+    <a href="https://cassiglitch.github.io/snake/" class="site-link green">game</a>
+    <br /><br />
+    <!-- Toggle controls: Custom mode selector and lock switch -->
+    <div class="toggle-controls" style="display: inline-flex; align-items: center;">
+      <!-- Custom checkbox – displays “ball” when unchecked and “Game” when checked -->
+      <label class="container" id="modeLabel">
+        <input type="checkbox" id="modeToggle" />
+        <div class="checkmark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon No" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 0C3.584 0 0 3.584 0 8s3.584 8 8 8c4.408 0 8-3.584 8-8s-3.592-8-8-8zm5.284 3.688a6.802 6.802 0 0 1 1.545 4.251c-.226-.043-2.482-.503-4.755-.217-.052-.112-.096-.234-.148-.355-.139-.33-.295-.668-.451-.99 2.516-1.023 3.662-2.498 3.81-2.69zM8 1.18c1.735 0 3.323.65 4.53 1.718-.122.174-1.155 1.553-3.584 2.464-1.12-2.056-2.36-3.74-2.551-4A6.95 6.95 0 0 1 8 1.18zm-2.907.642A43.123 43.123 0 0 1 7.627 5.77c-3.193.85-6.013.833-6.317.833a6.865 6.865 0 0 1 3.783-4.78zM1.163 8.01V7.8c.295.01 3.61.053 7.02-.971.199.381.381.772.555 1.162l-.27.078c-3.522 1.137-5.396 4.243-5.553 4.504a6.817 6.817 0 0 1-1.752-4.564zM8 14.837a6.785 6.785 0 0 1-4.19-1.44c.12-.252 1.509-2.924 5.361-4.269.018-.009.026-.009.044-.017a28.246 28.246 0 0 1 1.457 5.18A6.722 6.722 0 0 1 8 14.837zm3.81-1.171c-.07-.417-.435-2.412-1.328-4.868 2.143-.338 4.017.217 4.251.295a6.774 6.774 0 0 1-2.924 4.573z"></path>
+          </svg>
+          <p class="No name">ball</p>
+          <svg viewBox="0 0 16 16" class="icon Yes" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.5 6.027a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm2.5-.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1.5 1.5a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm-6.5-3h1v1h1v1h-1v1h-1v-1h-1v-1h1v-1z"></path>
+            <path d="M3.051 3.26a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .62.39c.655-.079 1.35-.117 2.043-.117.72 0 1.443.041 2.12.126a.5.5 0 0 1 .622-.399l1.932.518a.5.5 0 0 1 .306.729c.14.09.266.19.373.297.408.408.78 1.05 1.095 1.772.32.733.599 1.591.805 2.466.206.875.34 1.78.364 2.606.024.816-.059 1.602-.328 2.21a1.42 1.42 0 0 1-1.445.83c-.636-.067-1.115-.394-1.513-.773-.245-.232-.496-.526-.739-.808-.126-.148-.25-.292-.368-.423-.728-.804-1.597-1.527-3.224-1.527-1.627 0-2.496.723-3.224 1.527-.119.131-.242.275-.368.423-.243.282-.494.575-.739.808-.398.38-.877.706-1.513.773a1.42 1.42 0 0 1-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772a2.34 2.34 0 0 1 .433-.335.504.504 0 0 1-.028-.079zm2.036.412c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a13.748 13.748 0 0 0-.748 2.295 12.351 12.351 0 0 0-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 0 0 .426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.504C4.861 9.969 5.978 9.027 8 9.027s3.139.942 3.965 1.855c.164.181.307.348.44.504.214.251.403.472.615.674.318.303.601.468.929.503a.42.42 0 0 0 .426-.241c.18-.408.265-1.02.243-1.776a12.354 12.354 0 0 0-.339-2.406 13.753 13.753 0 0 0-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27-1.036 0-2.063.091-2.913.27z"></path>
+          </svg>
+          <p class="Yes name">Game</p>
         </div>
-        <p id="tttResult"></p>
+      </label>
+      <!-- The switch slider to lock/unlock the mode selector -->
+      <label class="switch">
+        <input type="checkbox" id="lockSwitch" />
+        <span class="slider"></span>
+      </label>
     </div>
+  </div>
 
-    <script>
-        function redirect() {
-            window.location.href = "https://cassiglitch.github.io/loadingscreen/";
+  <script>
+    // Destination links:
+    const gameLink = "https://cassiglitch.github.io/snake/";
+    const snakeLink = "https://cassiglitch.github.io/loadingscreen/";
 
-            setTimeout(function() {
-                window.location.href = "https://cassiglitch.github.io/snake/";
-            }, 5000); // 5000 milliseconds = 5 seconds
-        }
+    // Grab elements:
+    const lockSwitch = document.getElementById("lockSwitch");
+    const modeToggle = document.getElementById("modeToggle");
+    const modeLabel = document.getElementById("modeLabel");
 
-        var currentPlayer = "X";
-        var board = ["", "", "", "", "", "", "", "", ""];
-        var gameActive = true;
+    // Update the mode selector's enabled state based on the switch.
+    function updateModeToggle() {
+      modeToggle.disabled = lockSwitch.checked;
+    }
+    lockSwitch.addEventListener("change", updateModeToggle);
 
-        function playRPS() {
-            var choices = ["rock", "paper", "scissors"];
-            var computerChoice = choices[Math.floor(Math.random() * choices.length)];
-            var userChoice = document.getElementById("userChoice").value.toLowerCase();
-            var rpsResult = document.getElementById("rpsResult");
+    // This function performs redirection based on the current state.
+    function handleRedirect() {
+      window.location.href = modeToggle.checked ? gameLink : snakeLink;
+    }
 
-            if (choices.includes(userChoice)) {
-                var result;
-                rpsResult.classList.remove("animation", "shake", "scale");
-
-                if (userChoice === computerChoice) {
-                    result = "It's a tie!";
-                    rpsResult.classList.add("animation", "shake");
-                } else if ((userChoice === "rock" && computerChoice === "scissors") ||
-                           (userChoice === "paper" && computerChoice === "rock") ||
-                           (userChoice === "scissors" && computerChoice === "paper")) {
-                    result = "You win! Computer chose " + computerChoice + ".";
-                    rpsResult.classList.add("animation", "scale");
-                } else {
-                    result = "You lose! Computer chose " + computerChoice + ".";
-                    rpsResult.classList.add("animation", "shake");
-                }
-                rpsResult.innerText = result;
-            } else {
-                alert("Invalid choice! Please choose rock, paper, or scissors.");
-            }
-        }
-
-        function makeMove(index) {
-            if (gameActive && !board[index]) {
-                document.getElementsByClassName("cell")[index].innerText = currentPlayer;
-                board[index] = currentPlayer;
-
-                if (checkWinner()) {
-                    document.getElementById("tttResult").innerText = currentPlayer + " wins!";
-                    gameActive = false;
-                } else if (!board.includes("")) {
-                    document.getElementById("tttResult").innerText = "It's a tie!";
-                    gameActive = false;
-                } else {
-                    currentPlayer = currentPlayer === "X" ? "O" : "X";
-                    if (currentPlayer === "O") {
-                        setTimeout(makeAIMove, 500);
-                    }
-                }
-            }
-        }
-
-        function makeAIMove() {
-            var availableMoves = [];
-            for (var i = 0; i < board.length; i++) {
-                if (!board[i]) {
-                    availableMoves.push(i);
-                }
-            }
-            var randomIndex = Math.floor(Math.random() * availableMoves.length);
-            makeMove(availableMoves[randomIndex]);
-        }
-
-        function checkWinner() {
-            var winningCombos = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-                [0, 4, 8], [2, 4, 6] // Diagonals
-            ];
-            for (var i = 0; i < winningCombos.length; i++) {
-                var combo = winningCombos[i];
-                if (board[combo[0]] && board[combo[0]] === board[combo[1]] && board[combo[0]] === board[combo[2]]) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    </script>
+    // When the switch is locked, clicking anywhere on the mode selector triggers redirection.
+    modeLabel.addEventListener("click", function(event) {
+      if (lockSwitch.checked) {
+        event.preventDefault();
+        handleRedirect();
+      }
+    });
+  </script>
 </body>
 </html>
